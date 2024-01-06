@@ -41,9 +41,10 @@ const Home = () => {
       <ul>
         {todoList.map((item) => (
             <>
-          <li key={item.id}>{item.text}</li><span><button onClick={()=>deleteTodo(item.id)}>Delete</button></span><span><button onClick={()=>editTodo(item.id)}>Edit</button></span>
+          <li key={item.id}>{item.text}-----{item.id}</li><span><button onClick={()=>deleteTodo(item.id)}>Delete</button></span><span><button onClick={()=>editTodo(item.id)}>Edit</button></span>
           </>))}
       </ul>
+     {todoList.length>0 ? <button onClick={()=>setTodoList([])}>Clear All</button> : null}
     </>
   );
 };
