@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import Popup from "./Popup";
 const Home = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  let modalToggle = () =>{
+            setIsPopupOpen(!isPopupOpen);
+  }
   const [todo, setTodo] = useState("");
   const [todoList, setTodoList] = useState([]);
+  localStorage.setItem('items',todoList);
+  console.log(localStorage);
   const [toggleBtn,setToggleBtn] = useState(true);
   const [isEditItem,setIsEditItem] = useState(null);
-     console.log(setIsPopupOpen)
+     
   const addTodo = () => {
     if (todo.trim() !== "" && toggleBtn) {
       setTodoList([...todoList, { id: Date.now(), text: todo },
@@ -28,11 +33,11 @@ const Home = () => {
   setToggleBtn(true);
   };
   const deleteTodo = (id) =>{
-     const newList =  todoList.filter((item)=>{
-        return item.id !== id;
-       })
-       setTodoList(newList)
-  }
+    const newList =  todoList.filter((item)=>{
+       return item.id !== id;
+      })
+      setTodoList(newList)
+ }
   const editTodo = (id) =>{
       const editItem =  todoList.find((item)=>{
       return   item.id === id
@@ -45,7 +50,7 @@ const Home = () => {
   return (
     <>
        
-<Popup isOpen={isPopupOpen} />
+<Popup isOpen={isPopupOpen}  toggle={modalToggle} delete={deleteTodo}/>
 
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
@@ -102,7 +107,9 @@ const Home = () => {
                   {items.text}
                 </td>
                 <td className=" whitespace-nowrap px-3 py-4 text-sm text-white  fit-content sm:table-cell">
-                <button className="bg-red-400 p-2 rounded" onClick={()=>deleteTodo(items.id)}>Delete</button>
+                <button className="bg-red-400 p-2 rounded" onClick={()=>{setIsPopupOpen(true)
+                deleteTodo(items.id)
+                }}>Delete</button>
                 </td>
                 <td className=" whitespace-nowrap px-3 py-4 text-sm text-white lg:table-cell">
                 <button  className="bg-orange-400 p-2 rounded" onClick={()=>editTodo(items.id)}>Edit</button>
