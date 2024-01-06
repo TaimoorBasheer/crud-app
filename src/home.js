@@ -3,13 +3,28 @@ import React, { useRef, useState } from "react";
 const Home = () => {
   const [todo, setTodo] = useState("");
   const [todoList, setTodoList] = useState([]);
+  const [toggleBtn,setToggleBtn] = useState(true);
+  const [isEditItem,setIsEditItem] = useState(null);
      const ref = useRef();
   const addTodo = () => {
-    if (todo.trim() !== "") {
+    if (todo.trim() !== "" && toggleBtn) {
       setTodoList([...todoList, { id: Date.now(), text: todo },
       ]);
       setTodo("");
     }
+    else if (todo.trim() !== "" && !toggleBtn){
+
+      setTodoList(todoList.map((items)=>{
+        if(items.id === isEditItem){
+          return  { ...items, text: todo };
+
+                     }
+                     return items
+       
+      }))
+    }
+  setTodo("");
+  setToggleBtn(true);
   };
   const deleteTodo = (id) =>{
      const newList =  todoList.filter((item)=>{
@@ -18,14 +33,12 @@ const Home = () => {
        setTodoList(newList)
   }
   const editTodo = (id) =>{
-         todoList.find((item)=>{
-         if(item.id === id){
-         ref.current.value = item.text;
-         let newtext = ref.current.value;
-         item.text = newtext;
-         }
-         return true;
+      const editItem =  todoList.find((item)=>{
+      return   item.id === id
          })
+          setTodo(editItem.text);
+          setToggleBtn(false)
+        setIsEditItem(id);
   }
 
   return (
@@ -36,7 +49,9 @@ const Home = () => {
         onChange={(e) =>{setTodo(e.target.value);
         console.log(todo)}}
       />
-      <button onClick={addTodo}>Add Todo</button>
+      
+      <button onClick={addTodo}>{toggleBtn?"Add":"Update"}</button>
+      
 
       <ul>
         {todoList.map((item) => (
