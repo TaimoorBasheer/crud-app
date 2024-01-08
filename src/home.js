@@ -1,31 +1,27 @@
 import React, { useState , useEffect} from "react";
 import Popup from "./Popup";
 const Home = () => {
-  
+  const getLocalItems = () =>{
+    let list = localStorage.getItem('items');
+    if(list){
+      return JSON.parse(localStorage.getItem('items'))
+    }
+    return []
+   }
  
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [todo, setTodo] = useState("");
-  const [todoList, setTodoList] = useState([]);
+  const [todoList, setTodoList] = useState(getLocalItems());
   const [toggleBtn, setToggleBtn] = useState(true);
   const [isEditItem, setIsEditItem] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
-  // Load todoList from localStorage on component mount
+  
   useEffect(() => {
-    try {
-      const storedTodoList = JSON.stringify(localStorage.getItem('items')) || [];
-      setTodoList(storedTodoList);
-    } catch (error) {
-      console.error('Error parsing JSON from localStorage:', error);
-      
-     
-    }
-  }, []);
-
- 
-  useEffect(() => {
-    localStorage.setItem('items', JSON.parse(todoList));
+    localStorage.setItem('items', JSON.stringify(todoList));
   }, [todoList]);
+  
 
   const modalToggle = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -47,11 +43,21 @@ const Home = () => {
     setToggleBtn(true);
   };
 
+   
   const deleteTodo = (id) => {
-    const newList = todoList.filter((item) => item.id !== id);
-    setTodoList(newList);
+    setItemToDelete(id);
+    setIsPopupOpen(true);
   };
-
+  
+  const confirmDelete = () => {
+    const newList = todoList.filter((item) => item.id !== itemToDelete);
+    setTodoList(newList);
+    setIsPopupOpen(false);
+  };
+  
+  const cancelDelete = () => {
+    setIsPopupOpen(false);
+  };
   const editTodo = (id) => {
     const editItem = todoList.find((item) => item.id === id);
     setTodo(editItem.text);
@@ -62,7 +68,7 @@ const Home = () => {
   return (
     <>
        
-<Popup isOpen={isPopupOpen}  toggle={modalToggle} delete={deleteTodo}/>
+       <Popup isOpen={isPopupOpen} toggle={modalToggle} confirmAction={confirmDelete} cancelAction={cancelDelete} />
 
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
