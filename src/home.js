@@ -1,51 +1,63 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Popup from "./Popup";
 const Home = () => {
+  
+ 
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  let modalToggle = () =>{
-            setIsPopupOpen(!isPopupOpen);
-  }
   const [todo, setTodo] = useState("");
   const [todoList, setTodoList] = useState([]);
-  localStorage.setItem('items',todoList);
-  console.log(localStorage);
-  const [toggleBtn,setToggleBtn] = useState(true);
-  const [isEditItem,setIsEditItem] = useState(null);
+  const [toggleBtn, setToggleBtn] = useState(true);
+  const [isEditItem, setIsEditItem] = useState(null);
+
+  // Load todoList from localStorage on component mount
+  useEffect(() => {
+    try {
+      const storedTodoList = JSON.stringify(localStorage.getItem('items')) || [];
+      setTodoList(storedTodoList);
+    } catch (error) {
+      console.error('Error parsing JSON from localStorage:', error);
+      
      
+    }
+  }, []);
+
+ 
+  useEffect(() => {
+    localStorage.setItem('items', JSON.parse(todoList));
+  }, [todoList]);
+
+  const modalToggle = () => {
+    setIsPopupOpen(!isPopupOpen);
+  };
+
   const addTodo = () => {
     if (todo.trim() !== "" && toggleBtn) {
-      setTodoList([...todoList, { id: Date.now(), text: todo },
-      ]);
+      setTodoList([...todoList, { id: Date.now(), text: todo }]);
       setTodo("");
+    } else if (todo.trim() !== "" && !toggleBtn) {
+      setTodoList(todoList.map((items) => {
+        if (items.id === isEditItem) {
+          return { ...items, text: todo };
+        }
+        return items;
+      }));
     }
-    else if (todo.trim() !== "" && !toggleBtn){
-
-      setTodoList(todoList.map((items)=>{
-        if(items.id === isEditItem){
-          return  { ...items, text: todo };
-
-                     }
-                     return items
-       
-      }))
-    }
-  setTodo("");
-  setToggleBtn(true);
+    setTodo("");
+    setToggleBtn(true);
   };
-  const deleteTodo = (id) =>{
-    const newList =  todoList.filter((item)=>{
-       return item.id !== id;
-      })
-      setTodoList(newList)
- }
-  const editTodo = (id) =>{
-      const editItem =  todoList.find((item)=>{
-      return   item.id === id
-         })
-          setTodo(editItem.text);
-          setToggleBtn(false)
-        setIsEditItem(id);
-  }
+
+  const deleteTodo = (id) => {
+    const newList = todoList.filter((item) => item.id !== id);
+    setTodoList(newList);
+  };
+
+  const editTodo = (id) => {
+    const editItem = todoList.find((item) => item.id === id);
+    setTodo(editItem.text);
+    setToggleBtn(false);
+    setIsEditItem(id);
+  };
 
   return (
     <>
